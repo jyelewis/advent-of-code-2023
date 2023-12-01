@@ -13,20 +13,27 @@ fn challenge(input: &str) -> u32 {
     input
         .split("\n") // split by new line
         .filter(|x| !x.is_empty()) // drop empty lines
-        .map(|line| decode_calibration_value(line))
+        .map(|line| decode_calibration_value(line)) // "decode" the magic number from each line
         .sum()
 }
 
 fn decode_calibration_value(line: &str) -> u32 {
     // find first number word moving forwards
+    // find  last number word moving backwards
     let mut first_num = None;
     let mut last_num = None;
 
     // move forward through the string one character at a time until we find the first number
+    // abconetwonez
+    // ...^__       move cursor forward 3 until we match "one"
     for cursor in 0..line.len() {
+        // abconetwonez
+        //  bconetwonez
+        //   conetwonez
+        //    onetwonez <-- match found at start of string "one"
         let str_at_cursor = &line[cursor..];
 
-        first_num = first_num_in_str(str_at_cursor);
+        first_num = num_from_start_of_str(str_at_cursor);
         if first_num.is_some() {
             break;
         }
@@ -34,10 +41,16 @@ fn decode_calibration_value(line: &str) -> u32 {
     let first_num = first_num.expect("No first number found");
 
     // move backward through the string one character at a time until we find the last number
+    // abconetwonez
+    //         ^__.      move cursor backwards 4 until we match "one"
     for cursor in (0..line.len()).rev() {
+        //    z
+        //   ez
+        //  nez
+        // onez <-- match found at start of string "one"
         let str_at_cursor = &line[cursor..];
 
-        last_num = first_num_in_str(str_at_cursor);
+        last_num = num_from_start_of_str(str_at_cursor);
         if last_num.is_some() {
             break;
         }
@@ -45,11 +58,12 @@ fn decode_calibration_value(line: &str) -> u32 {
     let last_num = last_num.expect("No last number found");
 
     // treat first as the tens place, and last as the ones place
+    // i.e. 3 * 10 + 8 = 38
     return (first_num * 10) + last_num;
 }
 
 // finds the first number (either string or digit) in a string
-fn first_num_in_str(input: &str) -> Option<u32> {
+fn num_from_start_of_str(input: &str) -> Option<u32> {
     // "one_asdf" -> 1
     // "asdf_one_asdf -> 1
     // "2qwer" -> 2
@@ -93,26 +107,33 @@ mod tests {
 
     #[test]
     fn test_example_input() {
-        let example_input = "two1nine
+        let example_input = "
+two1nine
 eightwothree
 abcone2threexyz
 xtwone3four
 4nineeightseven2
 zoneight234
-7pqrstsixteen";
+7pqrstsixteen
+        "
+        .trim();
 
         assert_eq!(challenge(example_input), 281);
     }
 
     #[test]
-    fn test_first_num_in_str() {
-        assert_eq!(first_num_in_str("one"), Some(1));
-        assert_eq!(first_num_in_str("two"), Some(2));
-        assert_eq!(first_num_in_str("three"), Some(3));
-        assert_eq!(first_num_in_str("1"), Some(1));
-        assert_eq!(first_num_in_str("2"), Some(2));
-        assert_eq!(first_num_in_str("3"), Some(3));
-        assert_eq!(first_num_in_str("asdf"), None);
+    fn test_num_from_start_of_str() {
+        assert_eq!(num_from_start_of_str("one"), Some(1));
+        assert_eq!(num_from_start_of_str("two"), Some(2));
+        assert_eq!(num_from_start_of_str("twone"), Some(2));
+        assert_eq!(num_from_start_of_str("three"), Some(3));
+        assert_eq!(num_from_start_of_str("threeeeeeee"), Some(3));
+        assert_eq!(num_from_start_of_str("1"), Some(1));
+        assert_eq!(num_from_start_of_str("2"), Some(2));
+        assert_eq!(num_from_start_of_str("3"), Some(3));
+        assert_eq!(num_from_start_of_str("123"), Some(1));
+        assert_eq!(num_from_start_of_str("asdf4"), None);
+        assert_eq!(num_from_start_of_str("asdf"), None);
     }
 
     #[test]
