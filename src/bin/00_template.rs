@@ -11,12 +11,12 @@ fn main() {
     items.for_each(|x| println!("{}", x)); // print each value
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_main() {
-        main();
-    }
-}
+// #[cfg(test)]
+// mod tests {
+//     use super::*;
+//
+//     #[test]
+//     fn test_main() {
+//         main();
+//     }
+// }
