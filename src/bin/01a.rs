@@ -3,17 +3,17 @@ use std::fs;
 fn main() {
     let input_text = fs::read_to_string("inputs/01.txt").expect("Failed to read input file");
 
-    let answer1 = sum_of_calibration_values(&input_text);
+    let answer = challenge(&input_text);
 
-    println!("Day 1, Part 1: {}", answer1);
-    assert_eq!(answer1, 55621);
+    println!("Day 01, Part 1: {}", answer);
+    assert_eq!(answer, 55621);
 }
 
-fn sum_of_calibration_values(input: &str) -> u32 {
+fn challenge(input: &str) -> u32 {
     input
         .split("\n") // split by new line
         .filter(|x| !x.is_empty()) // drop empty lines
-        .map(|line| decode_calibration_value(line)) // split into chars iterator
+        .map(|line| decode_calibration_value(line))
         .sum()
 }
 
@@ -47,16 +47,16 @@ mod tests {
     }
 
     #[test]
+    fn test_example_input() {
+        let example_input = "1abc2\npqr3stu8vwx\na1b2c3d4e5f\ntreb7uchet";
+        assert_eq!(challenge(example_input), 142);
+    }
+
+    #[test]
     fn test_decode_calibration_value() {
         assert_eq!(decode_calibration_value("1abc2"), 12);
         assert_eq!(decode_calibration_value("pqr3stu8vwx"), 38);
         assert_eq!(decode_calibration_value("a1b2c3d4e5f"), 15);
         assert_eq!(decode_calibration_value("treb7uchet"), 77);
-    }
-
-    #[test]
-    fn test_sum_of_calibration_values() {
-        let input = "1abc2\npqr3stu8vwx\na1b2c3d4e5f\ntreb7uchet";
-        assert_eq!(sum_of_calibration_values(input), 142);
     }
 }
