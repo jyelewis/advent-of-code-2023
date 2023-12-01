@@ -48,7 +48,12 @@ fn decode_calibration_value(line: &str) -> u32 {
     return (first_num * 10) + last_num;
 }
 
+// finds the first number (either string or digit) in a string
 fn first_num_in_str(input: &str) -> Option<u32> {
+    // "one_asdf" -> 1
+    // "asdf_one_asdf -> 1
+    // "2qwer" -> 2
+
     // check if the first character is already a digit (0-9) and return if so
     if let Some(digit) = input.chars().next().unwrap().to_digit(10) {
         return Some(digit);
