@@ -361,7 +361,7 @@ mod tests {
             "
             .trim()
         );
-        assert_eq!(game.is_complete, false);
+        assert!(!game.is_complete);
 
         // final tick (game should not change)
         game.tick();
@@ -381,7 +381,7 @@ mod tests {
         );
 
         // game should be marked as complete
-        assert_eq!(game.is_complete, true);
+        assert!(game.is_complete);
     }
 
     #[test]
@@ -408,7 +408,7 @@ mod tests {
         // after tick 1
         game.tick();
         assert_eq!(game.num_ticks, 1);
-        assert_eq!(game.is_complete, false);
+        assert!(!game.is_complete);
         assert_eq!(
             game.to_debug_string(14, 12),
             "
@@ -431,7 +431,7 @@ mod tests {
         // after tick 2
         game.tick();
         assert_eq!(game.num_ticks, 2);
-        assert_eq!(game.is_complete, false);
+        assert!(!game.is_complete);
         assert_eq!(
             game.to_debug_string(14, 12),
             "
@@ -454,7 +454,7 @@ mod tests {
         // after tick 3
         game.tick();
         assert_eq!(game.num_ticks, 3);
-        assert_eq!(game.is_complete, false);
+        assert!(!game.is_complete);
         assert_eq!(
             game.to_debug_string(14, 12),
             "
@@ -477,7 +477,7 @@ mod tests {
         // after tick 4
         game.tick();
         assert_eq!(game.num_ticks, 4);
-        assert_eq!(game.is_complete, false);
+        assert!(!game.is_complete);
         assert_eq!(
             game.to_debug_string(14, 12),
             "
@@ -500,7 +500,7 @@ mod tests {
         // after tick 5
         game.tick();
         assert_eq!(game.num_ticks, 5);
-        assert_eq!(game.is_complete, false);
+        assert!(!game.is_complete);
         assert_eq!(
             game.to_debug_string(14, 12),
             "
@@ -523,7 +523,7 @@ mod tests {
         // skip ahead to tick 10
         game.tick_until(10);
         assert_eq!(game.num_ticks, 10);
-        assert_eq!(game.is_complete, false);
+        assert!(!game.is_complete);
         assert_eq!(
             game.to_debug_string(14, 12),
             "
