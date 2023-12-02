@@ -19,20 +19,20 @@ fn challenge_part1(input: &str) -> u32 {
 
     // number of possible games with the given cubes in the bag
     input
-        .split("\n") // split by new line
-        .filter(|line| !line.is_empty()) // drop empty lines
+        .split("\n")
+        .filter(|line| !line.is_empty())
         .map(|line| Game::from_str(line)) // parse each value into game
         .filter(|game| game.is_possible_with_only_cube_set(&available_cubes)) // filter to only possible with our cube set
-        .map(|possible_game| possible_game.id) // map to game id
-        .sum() // sum game ids
+        .map(|possible_game| possible_game.id)
+        .sum()
 }
 
 fn challenge_part2(input: &str) -> u32 {
     // sum of powers of minimum cube set for each game
     input
-        .split("\n") // split by new line
-        .filter(|line| !line.is_empty()) // drop empty lines
-        .map(|line| Game::from_str(line).minimum_cube_set().power()) // parse each value into game, get minumum cube set & calculate power
+        .split("\n")
+        .filter(|line| !line.is_empty())
+        .map(|line| Game::from_str(line).minimum_cube_set().power()) // parse each value into game, get minimum cube set & calculate power
         .sum() // sum powers
 }
 
