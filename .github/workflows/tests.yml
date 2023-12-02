@@ -30,5 +30,14 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-cargo-
 
-    - name: Lint & test
-      run: cargo fmt --check && cargo clippy --all-targets --all-features -- -D warnings && cargo test
+    - name: cargo build
+      run: cargo build
+
+    - name: cargo fmt
+      run: cargo fmt
+
+    - name: cargo clippy
+      run: cargo clippy --all-targets --all-features -- -D warnings
+
+    - name: cargo test
+      run: cargo test
