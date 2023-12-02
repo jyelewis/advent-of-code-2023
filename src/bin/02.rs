@@ -1,3 +1,4 @@
+use sscanf::sscanf;
 use std::cmp::max;
 use std::fs;
 
@@ -43,27 +44,17 @@ struct Game {
 
 impl Game {
     pub fn from_str(game_str: &str) -> Game {
-        // gross string parsing, ceebs pulling in a regex library
         // "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green" -> Game
-
-        let parts: Vec<&str> = game_str.split(":").collect();
-        let game_rounds_str = parts[1].trim();
-
-        let game_rounds: Vec<CubeSet> = game_rounds_str
-            .split(";")
-            .map(|round_str| CubeSet::from_str(round_str))
-            .collect();
+        let (id, game_rounds_str) = sscanf!(game_str, "Game {u32}: {str}").unwrap();
 
         Game {
             // "Game 12" -> 12
-            id: parts[0]
-                .split(" ")
-                .skip(1)
-                .next()
-                .unwrap()
-                .parse::<u32>()
-                .unwrap(),
-            game_rounds,
+            id,
+            // parse each provided round into a CubeSet
+            game_rounds: game_rounds_str
+                .split(";")
+                .map(|round_str| CubeSet::from_str(round_str))
+                .collect(),
         }
     }
 
@@ -107,17 +98,14 @@ impl Default for CubeSet {
 
 impl CubeSet {
     pub fn from_str(cubes_str: &str) -> CubeSet {
-        // "3 blue, 4 red" -> CubeSet
+        // cubes_str: "12 blue, 5 red, 6 green"
 
-        // start with a zeroed cubeset, not all colours may be provided in the cubes_str
+        // start with a zeroed CubeSet, not all colours may be provided in the cubes_str
         let mut cube_set = CubeSet::default();
 
-        for color_str in cubes_str.split(",") {
-            let color_str_parts: Vec<&str> = color_str.trim().split(" ").collect();
-
-            // "12 blue" -> 12, "blue"
-            let count = color_str_parts[0].parse::<u32>().unwrap();
-            let color = color_str_parts[1];
+        for cube_color_str in cubes_str.split(",") {
+            // " 12 blue" -> 12, "blue"
+            let (count, color) = sscanf!(cube_color_str.trim(), "{u32} {str}").unwrap();
 
             match color {
                 "blue" => cube_set.blue = count,
@@ -131,6 +119,7 @@ impl CubeSet {
     }
 
     pub fn is_possible_with_only_cube_set(&self, available_cubes: &CubeSet) -> bool {
+        // does the provided available_cubes, have enough cubes to replicate this cube_set?
         available_cubes.blue >= self.blue
             && available_cubes.red >= self.red
             && available_cubes.green >= self.green
@@ -163,6 +152,19 @@ Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green
         .trim();
 
         assert_eq!(challenge_part1(example_input), 8);
+    }
+
+    #[test]
+    fn test_cubeset_from_str() {
+        let cube_set = CubeSet::from_str("3 blue, 4 red");
+        assert_eq!(cube_set.red, 4);
+        assert_eq!(cube_set.green, 0);
+        assert_eq!(cube_set.blue, 3);
+
+        let cube_set = CubeSet::from_str("1 red, 2 green, 6 blue");
+        assert_eq!(cube_set.red, 1);
+        assert_eq!(cube_set.green, 2);
+        assert_eq!(cube_set.blue, 6);
     }
 
     #[test]
