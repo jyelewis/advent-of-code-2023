@@ -11,14 +11,29 @@ env:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
+    - name: Cache Cargo dependencies
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-
+
     - uses: actions/checkout@v3
+
     - name: Check formatting
       run: cargo fmt --check
+
     - name: Clippy check
       run: cargo clippy --all-targets --all-features -- -D warnings
+
     - name: Run tests
       run: cargo test
