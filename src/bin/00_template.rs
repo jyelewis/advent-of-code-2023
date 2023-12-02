@@ -11,13 +11,13 @@ fn main() {
 
 fn challenge(input: &str) -> u32 {
     let items = input
-        .split("\n")
+        .split('\n')
         .filter(|x| !x.is_empty())
         .map(|x| x.parse::<i32>().unwrap()); // parse each value
 
     items.for_each(|x| println!("{}", x));
 
-    return 0;
+    0
 }
 
 // #[cfg(test)]

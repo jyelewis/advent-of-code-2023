@@ -5,9 +5,9 @@ fn main() {
 
     // parse input into AssignmentPairs
     let assignment_pairs: Vec<AssignmentPair> = input_text
-        .split("\n") // split by new line
+        .split('\n') // split by new line
         .filter(|x| !x.is_empty()) // drop empty lines
-        .map(|line| AssignmentPair::from_str(line))
+        .map(AssignmentPair::from_str)
         .collect();
 
     // find which of these "fully contain" the other
@@ -91,28 +91,28 @@ mod tests {
 
     #[test]
     fn test_pair_fully_contains_other_pair() {
-        assert_eq!(AssignmentPair::from_str("1-2,3-4").fully_contains(), false);
-        assert_eq!(AssignmentPair::from_str("3-4,1-2").fully_contains(), false);
-        assert_eq!(AssignmentPair::from_str("1-4,2-3").fully_contains(), true);
-        assert_eq!(AssignmentPair::from_str("2-3,1-4").fully_contains(), true);
+        assert!(!AssignmentPair::from_str("1-2,3-4").fully_contains());
+        assert!(!AssignmentPair::from_str("3-4,1-2").fully_contains());
+        assert!(AssignmentPair::from_str("1-4,2-3").fully_contains());
+        assert!(AssignmentPair::from_str("2-3,1-4").fully_contains());
     }
 
     #[test]
     fn test_overlap() {
         // provided example cases
-        assert_eq!(AssignmentPair::from_str("5-7,7-9").overlaps(), true);
-        assert_eq!(AssignmentPair::from_str("2-8,3-7").overlaps(), true);
-        assert_eq!(AssignmentPair::from_str("6-6,4-6").overlaps(), true);
-        assert_eq!(AssignmentPair::from_str("2-6,4-8").overlaps(), true);
+        assert!(AssignmentPair::from_str("5-7,7-9").overlaps());
+        assert!(AssignmentPair::from_str("2-8,3-7").overlaps());
+        assert!(AssignmentPair::from_str("6-6,4-6").overlaps());
+        assert!(AssignmentPair::from_str("2-6,4-8").overlaps());
 
         // custom example cases
-        assert_eq!(AssignmentPair::from_str("1-2,3-4").overlaps(), false);
-        assert_eq!(AssignmentPair::from_str("3-4,1-2").overlaps(), false);
+        assert!(!AssignmentPair::from_str("1-2,3-4").overlaps());
+        assert!(!AssignmentPair::from_str("3-4,1-2").overlaps());
 
-        assert_eq!(AssignmentPair::from_str("1-4,2-3").overlaps(), true);
-        assert_eq!(AssignmentPair::from_str("2-3,1-4").overlaps(), true);
+        assert!(AssignmentPair::from_str("1-4,2-3").overlaps());
+        assert!(AssignmentPair::from_str("2-3,1-4").overlaps());
 
-        assert_eq!(AssignmentPair::from_str("1-3,2-4").overlaps(), true);
-        assert_eq!(AssignmentPair::from_str("2-4,1-3").overlaps(), true);
+        assert!(AssignmentPair::from_str("1-3,2-4").overlaps());
+        assert!(AssignmentPair::from_str("2-4,1-3").overlaps());
     }
 }

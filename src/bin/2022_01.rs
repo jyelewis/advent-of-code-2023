@@ -8,8 +8,8 @@ fn main() {
         .map(|elf_str|
             // calculate the sum of each item in the group
             elf_str
-                .split("\n")
-                .filter(|x| x.len() > 0) // split each group into lines
+                .split('\n')
+                .filter(|x| !x.is_empty()) // split each group into lines
                 .map(|line| line.trim().parse::<u32>().unwrap()) // parse as numbers
                 .sum())
         .collect();

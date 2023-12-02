@@ -11,9 +11,9 @@ fn main() {
 
 fn challenge(input: &str) -> u32 {
     input
-        .split("\n") // split by new line
+        .split('\n') // split by new line
         .filter(|x| !x.is_empty()) // drop empty lines
-        .map(|line| decode_calibration_value(line)) // "decode" the magic number from each line
+        .map(decode_calibration_value) // "decode" the magic number from each line
         .sum()
 }
 
@@ -59,7 +59,7 @@ fn decode_calibration_value(line: &str) -> u32 {
 
     // treat first as the tens place, and last as the ones place
     // i.e. 3 * 10 + 8 = 38
-    return (first_num * 10) + last_num;
+    (first_num * 10) + last_num
 }
 
 // finds the first number (either string or digit) in a string
@@ -93,7 +93,7 @@ fn num_from_start_of_str(input: &str) -> Option<u32> {
     }
 
     // couldn't find either :(
-    return None;
+    None
 }
 
 #[cfg(test)]

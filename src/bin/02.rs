@@ -19,9 +19,9 @@ fn challenge_part1(input: &str) -> u32 {
 
     // number of possible games with the given cubes in the bag
     input
-        .split("\n")
+        .split('\n')
         .filter(|line| !line.is_empty())
-        .map(|line| Game::from_str(line)) // parse each value into game
+        .map(Game::from_str) // parse each value into game
         .filter(|game| game.is_possible_with_only_cube_set(&available_cubes)) // filter to only possible with our cube set
         .map(|possible_game| possible_game.id)
         .sum()
@@ -30,7 +30,7 @@ fn challenge_part1(input: &str) -> u32 {
 fn challenge_part2(input: &str) -> u32 {
     // sum of powers of minimum cube set for each game
     input
-        .split("\n")
+        .split('\n')
         .filter(|line| !line.is_empty())
         .map(|line| Game::from_str(line).minimum_cube_set().power()) // parse each value into game, get minimum cube set & calculate power
         .sum() // sum powers
@@ -52,8 +52,8 @@ impl Game {
             id,
             // parse each provided round into a CubeSet
             game_rounds: game_rounds_str
-                .split(";")
-                .map(|round_str| CubeSet::from_str(round_str))
+                .split(';')
+                .map(CubeSet::from_str)
                 .collect(),
         }
     }
@@ -80,21 +80,14 @@ impl Game {
 }
 
 // --------------------------- CubeSet structure ---------------------------------------------
+#[derive(Default)]
 struct CubeSet {
     blue: u32,
     red: u32,
     green: u32,
 }
 
-impl Default for CubeSet {
-    fn default() -> Self {
-        CubeSet {
-            blue: 0,
-            red: 0,
-            green: 0,
-        }
-    }
-}
+
 
 impl CubeSet {
     pub fn from_str(cubes_str: &str) -> CubeSet {
@@ -103,7 +96,7 @@ impl CubeSet {
         // start with a zeroed CubeSet, not all colours may be provided in the cubes_str
         let mut cube_set = CubeSet::default();
 
-        for cube_color_str in cubes_str.split(",") {
+        for cube_color_str in cubes_str.split(',') {
             // " 12 blue" -> 12, "blue"
             let (count, color) = sscanf!(cube_color_str.trim(), "{u32} {str}").unwrap();
 

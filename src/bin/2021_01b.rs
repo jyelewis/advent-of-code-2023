@@ -12,7 +12,7 @@ fn main() {
 fn challenge(input: &str) -> u32 {
     // parse out input into an iter of u32s
     let depths: Vec<u32> = input
-        .split("\n") // split by new line
+        .split('\n') // split by new line
         .filter(|x| !x.is_empty()) // drop empty lines
         .map(|x| x.parse::<u32>().unwrap()) // parse each value
         .collect();
@@ -33,10 +33,10 @@ fn challenge(input: &str) -> u32 {
         last_depth = this_depth;
     }
 
-    return num_depths_increases;
+    num_depths_increases
 }
 
-fn value_for_sliding_window(depths: &Vec<u32>, start_index: usize) -> u32 {
+fn value_for_sliding_window(depths: &[u32], start_index: usize) -> u32 {
     vec![
         depths[start_index],
         depths[start_index + 1],

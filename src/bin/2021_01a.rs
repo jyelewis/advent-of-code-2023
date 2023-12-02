@@ -12,7 +12,7 @@ fn main() {
 fn challenge(input: &str) -> u32 {
     // parse out input into an iter of u32s
     let mut depths = input
-        .split("\n") // split by new line
+        .split('\n') // split by new line
         .filter(|x| !x.is_empty()) // drop empty lines
         .map(|x| x.parse::<i32>().unwrap()); // parse each value
 
@@ -30,7 +30,7 @@ fn challenge(input: &str) -> u32 {
         last_depth = depth;
     }
 
-    return num_depths_increases;
+    num_depths_increases
 }
 
 #[cfg(test)]

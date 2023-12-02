@@ -1,6 +1,6 @@
 // used to scaffold scripts for each day & and pull down the input
 
-use reqwest;
+
 use std::io::Write;
 use std::{fs, io};
 
@@ -30,7 +30,7 @@ fn main() {
         .replace("00", &format!("{day_num:02}"));
 
     // write both our a & b parts
-    fs::write(&script_path, &script_code).unwrap();
+    fs::write(&script_path, script_code).unwrap();
 
     // download input from AoC website
     let input_contents = download_input_from_aoc_api(day_num);
@@ -63,7 +63,7 @@ fn download_input_from_aoc_api(day_num: i32) -> String {
 
     // Build the request with custom headers
     let response = client
-        .get(&input_url)
+        .get(input_url)
         .headers(headers)
         .send()
         .expect("Failed to send request");
@@ -73,7 +73,7 @@ fn download_input_from_aoc_api(day_num: i32) -> String {
         panic!("Failed to fetch the file: {}", response.status());
     }
 
-    let contents = response.text().expect("Failed to read response text");
+    
 
-    return contents;
+    response.text().expect("Failed to read response text")
 }

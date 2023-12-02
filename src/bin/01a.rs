@@ -11,9 +11,9 @@ fn main() {
 
 fn challenge(input: &str) -> u32 {
     input
-        .split("\n") // split by new line
+        .split('\n') // split by new line
         .filter(|x| !x.is_empty()) // drop empty lines
-        .map(|line| decode_calibration_value(line)) // "decode" the magic number from each line
+        .map(decode_calibration_value) // "decode" the magic number from each line
         .sum()
 }
 
@@ -33,7 +33,7 @@ fn decode_calibration_value(line: &str) -> u32 {
 
     // treat first as the tens place, and last as the ones place
     // i.e. 3 * 10 + 8 = 38
-    return (first * 10) + last;
+    (first * 10) + last
 }
 
 #[cfg(test)]
