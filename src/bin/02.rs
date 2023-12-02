@@ -16,16 +16,18 @@ fn main() {
 fn challenge_part1(input: &str) -> u32 {
     let available_cubes = CubeSet::from_str("12 red, 13 green, 14 blue");
 
+    // number of possible games with the given cubes in the bag
     input
         .split("\n") // split by new line
         .filter(|line| !line.is_empty()) // drop empty lines
         .map(|line| Game::from_str(line)) // parse each value into game
-        .filter(|game| game.possible_with_only_cube_set(&available_cubes)) // filter to only possible with our cube set
+        .filter(|game| game.is_possible_with_only_cube_set(&available_cubes)) // filter to only possible with our cube set
         .map(|possible_game| possible_game.id) // map to game id
         .sum() // sum game ids
 }
 
 fn challenge_part2(input: &str) -> u32 {
+    // sum of powers of minimum cube set for each game
     input
         .split("\n") // split by new line
         .filter(|line| !line.is_empty()) // drop empty lines
@@ -41,6 +43,7 @@ struct Game {
 
 impl Game {
     pub fn from_str(game_str: &str) -> Game {
+        // gross string parsing, ceebs pulling in a regex library
         // "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green" -> Game
 
         let parts: Vec<&str> = game_str.split(":").collect();
@@ -64,15 +67,17 @@ impl Game {
         }
     }
 
-    pub fn possible_with_only_cube_set(&self, available_cubes: &CubeSet) -> bool {
+    pub fn is_possible_with_only_cube_set(&self, available_cubes: &CubeSet) -> bool {
+        // whether all the rounds within this game could have been played with only the available cubes
         self.game_rounds
             .iter()
-            .all(|round| round.possible_with_only_cube_set(available_cubes))
+            .all(|round| round.is_possible_with_only_cube_set(available_cubes))
     }
 
     pub fn minimum_cube_set(&self) -> CubeSet {
         let mut cube_set = CubeSet::default();
 
+        // find the maximum number of each colour used in any round
         for round in &self.game_rounds {
             cube_set.red = max(cube_set.red, round.red);
             cube_set.green = max(cube_set.green, round.green);
@@ -101,20 +106,18 @@ impl Default for CubeSet {
 }
 
 impl CubeSet {
-    pub fn from_str(round_str: &str) -> CubeSet {
+    pub fn from_str(cubes_str: &str) -> CubeSet {
         // "3 blue, 4 red" -> CubeSet
 
-        let parts: Vec<&str> = round_str.split(",").collect();
+        // start with a zeroed cubeset, not all colours may be provided in the cubes_str
         let mut cube_set = CubeSet::default();
 
-        for part in parts {
-            let part = part.trim();
+        for color_str in cubes_str.split(",") {
+            let color_str_parts: Vec<&str> = color_str.trim().split(" ").collect();
 
             // "12 blue" -> 12, "blue"
-            let count = part.split(" ").collect::<Vec<&str>>()[0]
-                .parse::<u32>()
-                .unwrap();
-            let color = part.split(" ").collect::<Vec<&str>>()[1];
+            let count = color_str_parts[0].parse::<u32>().unwrap();
+            let color = color_str_parts[1];
 
             match color {
                 "blue" => cube_set.blue = count,
@@ -127,7 +130,7 @@ impl CubeSet {
         cube_set
     }
 
-    pub fn possible_with_only_cube_set(&self, available_cubes: &CubeSet) -> bool {
+    pub fn is_possible_with_only_cube_set(&self, available_cubes: &CubeSet) -> bool {
         available_cubes.blue >= self.blue
             && available_cubes.red >= self.red
             && available_cubes.green >= self.green
