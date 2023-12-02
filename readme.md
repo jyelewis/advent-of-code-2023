@@ -5,6 +5,7 @@
 
 # Challenges
 * Day 1: [Part 1](/src/bin/01a.rs) ✅, [Part 2](/src/bin/01b.rs) ✅
+* Day 2: [Part 1](/src/bin/02.rs) ✅, [Part 2](/src/bin/02.rs) ✅
 
 
 #### Other years (doing some old ones for extra ⭐️⭐️⭐️️)
