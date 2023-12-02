@@ -37,13 +37,7 @@ fn challenge(input: &str) -> u32 {
 }
 
 fn value_for_sliding_window(depths: &[u32], start_index: usize) -> u32 {
-    vec![
-        depths[start_index],
-        depths[start_index + 1],
-        depths[start_index + 2],
-    ]
-    .iter()
-    .sum()
+    depths[start_index] + depths[start_index + 1] + depths[start_index + 2]
 }
 
 #[cfg(test)]
