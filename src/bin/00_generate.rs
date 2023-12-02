@@ -1,6 +1,5 @@
 // used to scaffold scripts for each day & and pull down the input
 
-
 use std::io::Write;
 use std::{fs, io};
 
@@ -72,8 +71,6 @@ fn download_input_from_aoc_api(day_num: i32) -> String {
     if !response.status().is_success() {
         panic!("Failed to fetch the file: {}", response.status());
     }
-
-    
 
     response.text().expect("Failed to read response text")
 }

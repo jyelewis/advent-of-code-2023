@@ -51,10 +51,7 @@ impl Game {
             // "Game 12" -> 12
             id,
             // parse each provided round into a CubeSet
-            game_rounds: game_rounds_str
-                .split(';')
-                .map(CubeSet::from_str)
-                .collect(),
+            game_rounds: game_rounds_str.split(';').map(CubeSet::from_str).collect(),
         }
     }
 
@@ -86,8 +83,6 @@ struct CubeSet {
     red: u32,
     green: u32,
 }
-
-
 
 impl CubeSet {
     pub fn from_str(cubes_str: &str) -> CubeSet {
