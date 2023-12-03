@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet, VecDeque};
+use std::collections::VecDeque;
 use std::fs;
 
 fn main() {
@@ -8,7 +8,14 @@ fn main() {
     println!("2022, Day 23, Part 1: {}", answer1);
     assert_eq!(answer1, 4114);
 
+    // Base: 7.93s / 490ms
+    // Optimisation custom hashset + iterator: 610ms / 73ms
+    // next: Measure where time is taken
+
+    // let start = std::time::Instant::now();
     let answer2 = challenge_part2(&input);
+    // println!("Time elapsed in challenge_part2() is: {:?}", start.elapsed());
+
     println!("2022, Day 23, Part 2: {}", answer2);
     assert_eq!(answer2, 970);
 }
@@ -39,8 +46,79 @@ enum Direction {
     West,
 }
 
+const POSITION_MAP_WIDTH: usize = 225;
+const POSITION_MAP_HEIGHT: usize = 225;
+const POSITION_MAP_OFFSET: usize = 75;
+struct ElfPositionMap {
+    pos_spacial_idx: [u8; POSITION_MAP_WIDTH * POSITION_MAP_HEIGHT],
+    // honestly probably faster to scan the area. It's like 50% dense
+}
+
+impl<'a> ElfPositionMap {
+    fn new() -> ElfPositionMap {
+        ElfPositionMap {
+            pos_spacial_idx: [0; POSITION_MAP_WIDTH * POSITION_MAP_HEIGHT],
+        }
+    }
+
+    fn index(&self, position: &ElfPosition) -> usize {
+        let shifted_x = (position.x + POSITION_MAP_OFFSET as i32) as usize;
+        let shifted_y = (position.y + POSITION_MAP_OFFSET as i32) as usize;
+
+        shifted_x + shifted_y * POSITION_MAP_WIDTH
+    }
+
+    fn set(&mut self, position: &ElfPosition, value: u8) {
+        self.pos_spacial_idx[self.index(position)] = value;
+    }
+
+    fn add(&mut self, position: &ElfPosition, value: u8) {
+        self.pos_spacial_idx[self.index(position)] += value;
+    }
+
+    fn get(&self, position: &ElfPosition) -> u8 {
+        self.pos_spacial_idx[self.index(position)]
+    }
+
+    fn clear(&mut self) {
+        self.pos_spacial_idx = [0; POSITION_MAP_WIDTH * POSITION_MAP_HEIGHT];
+    }
+
+    fn iter(&self) -> ElfPositionMapIterator {
+        ElfPositionMapIterator {
+            elf_position_map: self,
+            current_index: 0,
+        }
+    }
+}
+
+struct ElfPositionMapIterator<'a> {
+    elf_position_map: &'a ElfPositionMap,
+    current_index: usize,
+}
+
+impl<'a> Iterator for ElfPositionMapIterator<'a> {
+    type Item = ElfPosition;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        while self.current_index < self.elf_position_map.pos_spacial_idx.len() {
+            let current_index = self.current_index;
+            self.current_index += 1;
+
+            if self.elf_position_map.pos_spacial_idx[current_index] == 1 {
+                let x = (current_index % POSITION_MAP_WIDTH) as i32 - POSITION_MAP_OFFSET as i32;
+                let y = (current_index / POSITION_MAP_WIDTH) as i32 - POSITION_MAP_OFFSET as i32;
+                return Some(ElfPosition { x, y });
+            }
+        }
+
+        None
+    }
+}
+
 struct Game {
-    elf_positions: HashSet<ElfPosition>,
+    elf_positions: ElfPositionMap,
+    // TODO: coming for this next
     move_ordering: VecDeque<Direction>,
     is_complete: bool,
     num_ticks: usize,
@@ -48,16 +126,18 @@ struct Game {
 
 impl Game {
     fn from_str(input: &str) -> Game {
-        let mut elf_positions: HashSet<ElfPosition> = HashSet::new();
+        let mut elf_positions = ElfPositionMap::new();
+
+        // optimisation: re-use elf position when loading from string
+        let mut elf_position = ElfPosition { x: 0, y: 0 };
 
         let lines = input.split('\n').filter(|x| !x.is_empty());
         for (y, line) in lines.enumerate() {
             for (x, c) in line.chars().enumerate() {
                 if c == '#' {
-                    elf_positions.insert(ElfPosition {
-                        x: x as i32,
-                        y: y as i32,
-                    });
+                    elf_position.x = x as i32;
+                    elf_position.y = y as i32;
+                    elf_positions.set(&elf_position, 1);
                 }
             }
         }
@@ -75,33 +155,32 @@ impl Game {
             num_ticks: 0,
         }
     }
-    fn get_next_positions(&self) -> Option<HashSet<ElfPosition>> {
+    fn get_next_positions(&self) -> Option<ElfPositionMap> {
         // room for optimisation here, takes ~4ms per tick in debug mode
 
         // for each position, compute a proposed next position for this game state
-        let proposed_moves: Vec<(&ElfPosition, ElfPosition)> = self
+        let proposed_moves: Vec<(ElfPosition, ElfPosition)> = self
             .elf_positions
             .iter()
-            .map(|elf_position| (elf_position, elf_position.proposed_next_position(self)))
+            .map(|elf_position| (elf_position.proposed_next_position(self), elf_position))
+            // TODO: this is killing performance, we we do something smarter to iterate these?
             .collect();
 
         // iterate proposed moves, count proposed moves per destination
         // and check if we want to move at all
         let mut has_moves = false;
-        let mut num_elfs_wanting_to_move_into_position: HashMap<ElfPosition, usize> =
-            HashMap::new();
 
-        for (current_position, proposed_position) in proposed_moves.iter() {
+        // TODO: re-use this position map between ticks
+        let mut num_elfs_wanting_to_move_into_position = ElfPositionMap::new();
+
+        for (proposed_position, current_position) in proposed_moves.iter() {
             // if we want to move, the game isn't over - take note of this
-            if proposed_position != *current_position {
+            if *proposed_position != *current_position {
                 has_moves = true;
             }
 
             // keep track of how many elfs want to move into this position
-            num_elfs_wanting_to_move_into_position
-                .entry(proposed_position.clone())
-                .and_modify(|x| *x += 1)
-                .or_insert(1);
+            num_elfs_wanting_to_move_into_position.add(&proposed_position, 1);
         }
 
         if !has_moves {
@@ -109,19 +188,16 @@ impl Game {
             return None;
         }
 
+        // TODO: re-use this position map between ticks
         // iterate proposed moves, move into proposed solution if no other elfs want to move there
-        let mut next_positions: HashSet<ElfPosition> = HashSet::new();
-        for (current_position, proposed_position) in proposed_moves {
+        let mut next_positions = ElfPositionMap::new();
+        for (proposed_position, current_position) in proposed_moves {
             // keep track of how many elfs want to move into this position
-            if *num_elfs_wanting_to_move_into_position
-                .get(&proposed_position)
-                .unwrap()
-                == 1
-            {
-                next_positions.insert(proposed_position.clone());
+            if num_elfs_wanting_to_move_into_position.get(&proposed_position) == 1 {
+                next_positions.set(&proposed_position, 1);
             } else {
                 // someone else wants to move here.. stay where we are
-                next_positions.insert(current_position.clone());
+                next_positions.set(&current_position, 1);
             }
         }
 
@@ -167,7 +243,7 @@ impl Game {
         let mut num_empty_ground_tiles = 0;
         for y in min_y..=max_y {
             for x in min_x..=max_x {
-                if !self.elf_positions.contains(&ElfPosition { x, y }) {
+                if self.elf_positions.get(&ElfPosition { x, y }) == 0 {
                     num_empty_ground_tiles += 1;
                 }
             }
@@ -181,7 +257,7 @@ impl Game {
 
         for y in 0..=(height - 1) {
             for x in 0..=(width - 1) {
-                output_str += if self.elf_positions.contains(&ElfPosition { x, y }) {
+                output_str += if self.elf_positions.get(&ElfPosition { x, y }) == 1 {
                     "#"
                 } else {
                     "."
@@ -203,14 +279,14 @@ struct ElfPosition {
 impl ElfPosition {
     fn proposed_next_position(&self, game: &Game) -> ElfPosition {
         let current_elf_positions = &game.elf_positions;
-        let n = current_elf_positions.contains(&self.north());
-        let ne = current_elf_positions.contains(&self.north().east());
-        let e = current_elf_positions.contains(&self.east());
-        let se = current_elf_positions.contains(&self.south().east());
-        let s = current_elf_positions.contains(&self.south());
-        let sw = current_elf_positions.contains(&self.south().west());
-        let w = current_elf_positions.contains(&self.west());
-        let nw = current_elf_positions.contains(&self.north().west());
+        let n = current_elf_positions.get(&self.north()) == 1;
+        let ne = current_elf_positions.get(&self.north().east()) == 1;
+        let e = current_elf_positions.get(&self.east()) == 1;
+        let se = current_elf_positions.get(&self.south().east()) == 1;
+        let s = current_elf_positions.get(&self.south()) == 1;
+        let sw = current_elf_positions.get(&self.south().west()) == 1;
+        let w = current_elf_positions.get(&self.west()) == 1;
+        let nw = current_elf_positions.get(&self.north().west()) == 1;
 
         if !n && !ne && !e && !se && !s && !sw && !w && !nw {
             // If no other Elves are in one of those eight positions,
@@ -285,11 +361,10 @@ impl ElfPosition {
 mod tests {
     use super::*;
 
-    // skipping main, as it takes ~10s to run in debug - _performance version runs and is faster
-    // #[test]
-    // fn test_main() {
-    //     main();
-    // }
+    #[test]
+    fn test_main() {
+        main();
+    }
 
     #[test]
     fn test_elf_positions() {
