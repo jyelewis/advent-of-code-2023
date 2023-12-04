@@ -1,7 +1,7 @@
 use std::fs;
 
 fn main() {
-    let input = fs::read_to_string("inputs/01.txt").expect("Failed to read input file");
+    let input = fs::read_to_string("inputs/00.txt").expect("Failed to read input file");
 
     let answer = challenge(&input);
 

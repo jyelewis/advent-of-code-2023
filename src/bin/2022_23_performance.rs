@@ -54,7 +54,7 @@ struct ElfPositionMap {
     // honestly probably faster to scan the area. It's like 50% dense
 }
 
-impl<'a> ElfPositionMap {
+impl ElfPositionMap {
     fn new() -> ElfPositionMap {
         ElfPositionMap {
             pos_spacial_idx: [0; POSITION_MAP_WIDTH * POSITION_MAP_HEIGHT],
@@ -78,10 +78,6 @@ impl<'a> ElfPositionMap {
 
     fn get(&self, position: &ElfPosition) -> u8 {
         self.pos_spacial_idx[self.index(position)]
-    }
-
-    fn clear(&mut self) {
-        self.pos_spacial_idx = [0; POSITION_MAP_WIDTH * POSITION_MAP_HEIGHT];
     }
 
     fn iter(&self) -> ElfPositionMapIterator {
@@ -180,7 +176,7 @@ impl Game {
             }
 
             // keep track of how many elfs want to move into this position
-            num_elfs_wanting_to_move_into_position.add(&proposed_position, 1);
+            num_elfs_wanting_to_move_into_position.add(proposed_position, 1);
         }
 
         if !has_moves {
