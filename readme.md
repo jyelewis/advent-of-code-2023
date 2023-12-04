@@ -7,6 +7,7 @@
 * Day 01: [Part 1](/src/bin/01a.rs) ✅, [Part 2](/src/bin/01b.rs) ✅
 * Day 02: [Part 1](/src/bin/02.rs) ✅, [Part 2](/src/bin/02.rs) ✅
 * Day 03: [Part 1](/src/bin/03.rs) ✅, [Part 2](/src/bin/03.rs) ✅
+* Day 04: [Part 1](/src/bin/04.rs) ✅, [Part 2](/src/bin/04.rs) ✅
 
 
 #### Other years (doing some old ones for extra ⭐️⭐️⭐️️)
