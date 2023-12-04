@@ -17,7 +17,7 @@
 * 2022 Day 23: [Part 1](/src/bin/2022_23.rs) ✅, [Part 2](/src/bin/2022_23.rs) ✅, [Performance optimisations](/src/bin/2022_23_performance.rs) 🐝
 
 #### Performance
-Total time to run all tests & all challenges: 0.15s
+Total time to run all tests & all challenges: 0.07s
 
 # Usage
 1. Generate new day `cargo run --bin 00_generate`
