@@ -14,7 +14,7 @@ fn main() {
     let day_num: i32 = input.trim().parse().expect("Please enter a number!");
 
     // generate paths for script & input files we will write
-    let script_path = format!("src/bin/{day_num:02}a.rs");
+    let script_path = format!("src/bin/{day_num:02}.rs");
     let input_path = format!("inputs/{day_num:02}.txt");
 
     // check if either file already exists
